@@ -22,11 +22,14 @@ def generate_report_endpoint():
         file_stream.write(report_text.encode('utf-8'))
         file_stream.seek(0)
 
-        return send_file(
-            file_stream,
-            as_attachment=True,
-            download_name=f"weekly_report_{datetime.now().date()}.txt",
-            mimetype="text/plain"
+        from flask import Response
+
+        return Response(
+            report_text,
+            mimetype="text/plain",
+            headers={
+                "Content-Disposition": f"attachment; filename=weekly_report_{datetime.now().date()}.txt"
+            }
         )
 
     except Exception as e:
