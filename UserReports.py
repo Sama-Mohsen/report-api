@@ -233,11 +233,6 @@ Return the response strictly in valid JSON format like:
             time.sleep(2)
     return "Error: Unable to generate the report right now."
 
-def save_report(report_text, filename=f"weekly_report_{datetime.now().date()}.json"):
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(report_text)
-    print(f"Report saved as {filename}")
-
 def Report(user_token):
     history=fetch_conversations(user_token)
     if isinstance(history, str) and history.startswith("Error"):
@@ -245,5 +240,4 @@ def Report(user_token):
     filter_this_week(history)
     conversations = format_conversations(history)
     report = generate_report(conversations)
-    save_report(report)
     return report
