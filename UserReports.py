@@ -31,6 +31,7 @@ def fetch_conversations(user_token):
         return data
     else:
         # print("Error:", response.status_code)
+        print(f'''Error: {response.status_code}\n{response.text}''')
         return f'''Error: {response.status_code}\n{response.text}'''
 
 def format_previous_messages(conv, start_of_week, end_of_week):
@@ -115,7 +116,7 @@ def generate_report(conversations):
         ),
     ]
     generate_content_config = types.GenerateContentConfig(
-        # response_mime_type="application/json",
+        response_mime_type="application/json",
         system_instruction=[
             types.Part.from_text(text="""
 You are a supportive AI mental health assistant (not a licensed therapist).
@@ -206,32 +207,14 @@ Always generate the response in the following format:
 - Limit suggestions to 2–4 items maximum to avoid overwhelming the user.
 - Make all suggestions feel natural, relevant, and supportive.
 
-Formatting rules:
-- Use plain text only (no Markdown).
-- Use simple bullet points with "-" only.
-- Do not bold or italicize any words.
-- Keep the text clean and ready for PDF export.
+Return the response strictly in valid JSON format like:
 
-Formatting requirements for Suggestions:
-  - Always put book titles inside quotation marks (" ").
-  - Always put podcast names inside quotation marks (" ").
-  - Do NOT leave them as plain text.
-  - Keep recommendations clearly distinguishable from normal text.
-
-Structure:
-Emotional Summary:
-<your text>
-
-Key Patterns:
-- point
-- point
-
-Supportive Feedback:
-<your text>
-
-Suggestions:
-- suggestion
-- suggestion
+{
+  "emotional_summary": "",
+  "patterns": [],
+  "feedback": "",
+  "suggestions": []
+}
 """),
         ],
     )
@@ -250,15 +233,17 @@ Suggestions:
             time.sleep(2)
     return "Error: Unable to generate the report right now."
 
-def save_report(report_text, filename=f"weekly_report_{datetime.now().date()}.txt"):
+def save_report(report_text, filename=f"weekly_report_{datetime.now().date()}.json"):
     with open(filename, "w", encoding="utf-8") as f:
         f.write(report_text)
     print(f"Report saved as {filename}")
 
 def Report(user_token):
     history=fetch_conversations(user_token)
+    if isinstance(history, str) and history.startswith("Error"):
+        return "Error: Unable to generate the report right now."
     filter_this_week(history)
     conversations = format_conversations(history)
     report = generate_report(conversations)
-    # save_report(report)
+    save_report(report)
     return report

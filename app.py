@@ -1,7 +1,6 @@
-from flask import Flask, request, send_file
-import io
+from flask import Flask, request, jsonify
 import os
-from datetime import datetime
+import json
 from UserReports import Report
 
 app = Flask(__name__)
@@ -10,30 +9,29 @@ app = Flask(__name__)
 def generate_report_endpoint():
     data = request.get_json()
 
+    # Validate input
     if not data or 'token' not in data:
-        return {"error": "Token is required"}, 400
+        return jsonify({"error": "Token is required"}), 400
 
     user_token = data['token']
 
     try:
+        # Generate report (string JSON)
         report_text = Report(user_token)
 
-        file_stream = io.BytesIO()
-        file_stream.write(report_text.encode('utf-8'))
-        file_stream.seek(0)
+        # Convert string → JSON object
+        report_json = json.loads(report_text)
 
-        from flask import Response
-
-        return Response(
-            report_text,
-            mimetype="text/plain",
-            headers={
-                "Content-Disposition": f"attachment; filename=weekly_report_{datetime.now().date()}.txt"
-            }
-        )
+        return jsonify({
+            "status": "success",
+            "data": report_json
+        })
 
     except Exception as e:
-        return {"error": str(e)}, 500
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 
 if __name__ == '__main__':
