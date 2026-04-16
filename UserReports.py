@@ -236,7 +236,7 @@ Return the response strictly in valid JSON format like:
 def Report(user_token):
     history=fetch_conversations(user_token)
     if isinstance(history, str) and history.startswith("Error"):
-        return {"error": "invalid_token"}
+        return {"error": "invalid_token or expired token"}
     filter_this_week(history)
     conversations = format_conversations(history)
     report = generate_report(conversations)
