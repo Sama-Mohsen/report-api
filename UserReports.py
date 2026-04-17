@@ -248,4 +248,4 @@ def Report(user_token):
         return report
 
     except Exception:
-        return {"error": "failed_to_generate_report"}
+        return {"error": "unable_to_generate_report_rightnow"}
