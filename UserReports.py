@@ -211,7 +211,7 @@ Return the response strictly in valid JSON format like:
     return "Error: Unable to generate the report right now."
 
 def Report(history):
-    filter_this_week(history)
+    history = filter_this_week(history)
     conversations = format_conversations(history)
     try:
         report = generate_report(conversations)
