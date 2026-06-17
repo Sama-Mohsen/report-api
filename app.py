@@ -22,12 +22,7 @@ def generate_report_endpoint():
         # Generate report
         report_text = Report(user_id)
 
-        # 👇 Handle error from Report (NEW)
-        # if isinstance(report_text, dict) and "error" in report_text:
-        #     return jsonify({
-        #         "status": "error",
-        #         "message": report_text["error"]
-        #     }), 401
+        # 👇 Handle error from Report
         if isinstance(report_text, dict) and "error" in report_text:
             return jsonify({
                 "status": "error",
